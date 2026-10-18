@@ -209,7 +209,8 @@ const CSS_BUSCADOR = `
 .volver { color: var(--enlace); text-decoration: none; }
 form { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: flex-end; margin: 0 0 16px; }
 form label { display: flex; flex-direction: column; flex: 1 1 140px; color: var(--suave); font-size: 0.9rem; }
-form input {
+form label.pantano { flex-basis: 100%; }
+form input, form select {
   font: inherit; padding: 8px; border: 1px solid var(--borde); border-radius: 8px;
   background: var(--tarjeta); color: var(--texto);
 }
@@ -222,15 +223,31 @@ form button {
 .modelo label { flex-direction: row; align-items: center; gap: 6px; flex: 0 0 auto; color: var(--texto); font-size: 1rem; }
 .buscando, .nota { color: var(--suave); }
 .nota { margin: 0 0 8px; }
+.mapa { margin: 16px 0 0; }
+.mapa iframe { display: block; width: 100%; height: 400px; border: 0; border-radius: 8px; }
 `;
 
-export function generarHtmlBuscador() {
+// Desplegable con los pantanos de config/goodwind.json: al elegir uno, buscador.js rellena sus coordenadas.
+// Cada opción lleva «latitud;longitud», que separarPareja ya sabe leer.
+function selectorPantanos(pantanos) {
+  if (pantanos.length === 0) return "";
+  const opciones = pantanos
+    .map((p) => `<option value="${p.latitud};${p.longitud}">${escapar(p.nombre)}</option>`)
+    .join("\n");
+  return (
+    `<label class="pantano" for="pantano">Pantano <select id="pantano">\n` +
+    `<option value="">Elegir un pantano…</option>\n${opciones}\n</select></label>\n`
+  );
+}
+
+export function generarHtmlBuscador({ pantanos = [] } = {}) {
   return pagina({
     titulo: TITULO,
     cabeza: `<style>${CSS_BUSCADOR}</style>\n<script type="module" src="js/buscador.js"></script>\n`,
     cuerpo:
       `<p><a class="volver" href="index.html">← Pantanos</a></p>\n` +
       `<form id="buscador" novalidate>\n` +
+      selectorPantanos(pantanos) +
       `<label for="latitud">Latitud <input id="latitud" name="latitud" placeholder="40.757" autocomplete="off"></label>\n` +
       `<label for="longitud">Longitud <input id="longitud" name="longitud" placeholder="-3.583" autocomplete="off"></label>\n` +
       `<fieldset class="modelo"><legend>Modelo</legend>\n` +
@@ -245,18 +262,39 @@ export function generarHtmlBuscador() {
 
 const NOMBRE_MODELO = { estandar: "Modelo estándar", arome: "AROME HD" };
 
+// Mapa de viento incrustado de Windy (widget gratuito, sin clave), centrado en el punto buscado y en nudos.
+export function urlMapaWindy({ latitud, longitud }) {
+  const url = new URL("https://embed.windy.com/embed2.html");
+  for (const [clave, valor] of Object.entries({
+    type: "map", location: "coordinates", lat: latitud, lon: longitud, detailLat: latitud, detailLon: longitud,
+    zoom: 9, level: "surface", overlay: "wind", metricWind: "kt", marker: "true",
+  })) {
+    url.searchParams.set(clave, String(valor));
+  }
+  return url.toString();
+}
+
+export function htmlMapaWindy(coordenadas) {
+  return (
+    `<div class="mapa">\n<p class="nota">Mapa de viento: Windy.com (modelo ECMWF)</p>\n` +
+    `<iframe src="${escapar(urlMapaWindy(coordenadas))}" title="Mapa de viento de Windy" loading="lazy"></iframe>\n</div>`
+  );
+}
+
+// El mapa sale siempre que las coordenadas sean válidas, también si falla la tabla.
 export function htmlResultado(resultado, { latitud, longitud, modelo }) {
+  const mapa = `\n${htmlMapaWindy({ latitud, longitud })}`;
   if (resultado.estado === "fuera-de-cobertura") {
-    return `<p class="sin-datos">AROME HD no cubre esta ubicación. Prueba sin AROME.</p>`;
+    return `<p class="sin-datos">AROME HD no cubre esta ubicación. Prueba sin AROME.</p>${mapa}`;
   }
   if (resultado.estado !== "ok") {
-    return `<p class="sin-datos">No se ha podido obtener la previsión. Inténtalo de nuevo en unos minutos.</p>`;
+    return `<p class="sin-datos">No se ha podido obtener la previsión. Inténtalo de nuevo en unos minutos.</p>${mapa}`;
   }
   const titulo = `${latitud}, ${longitud} · ${NOMBRE_MODELO[modelo] ?? NOMBRE_MODELO.estandar}`;
   const nota = resultado.hasta
     ? `<p class="nota">Previsión AROME HD hasta el ${textoDia(resultado.hasta.fecha)} a las ${resultado.hasta.hora}h</p>\n`
     : "";
-  return `<section>\n<h2>${escapar(titulo)}</h2>\n${nota}${tabla(resultado.dias)}\n</section>`;
+  return `<section>\n<h2>${escapar(titulo)}</h2>\n${nota}${tabla(resultado.dias)}${mapa}\n</section>`;
 }
 
 export function htmlCoordenadasNoValidas() {
