@@ -1,0 +1,109 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GoodWind — previsión de viento</title>
+<style>
+:root {
+  --fondo: #f7f9fb; --texto: #14212b; --suave: #5b6b78; --borde: #c9d2da;
+  --tarjeta: #ffffff; --enlace: #0b5cad; --boton: #1f9d55; --boton-texto: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fondo: #0f1820; --texto: #e6edf2; --suave: #9aabb8; --borde: #2c3b47;
+    --tarjeta: #16222c; --enlace: #6cb4ff;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; padding: 16px; background: var(--fondo); color: var(--texto);
+  font: 16px/1.4 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+main { max-width: 960px; margin: 0 auto; }
+h1 { font-size: 1.4rem; margin: 0 0 4px; }
+h2 { font-size: 1.15rem; margin: 0 0 8px; }
+.actualizado { color: var(--suave); margin: 0 0 12px; }
+.compartir, .buscar {
+  display: inline-block; margin: 0 8px 16px 0; padding: 10px 16px; border-radius: 8px;
+  background: var(--boton); color: var(--boton-texto); font-weight: bold; text-decoration: none;
+}
+nav ul { list-style: none; padding: 0; margin: 0 0 16px; display: flex; flex-wrap: wrap; gap: 8px; }
+nav a {
+  display: block; padding: 6px 10px; border: 1px solid var(--borde); border-radius: 999px;
+  color: var(--enlace); text-decoration: none; background: var(--tarjeta);
+}
+section {
+  background: var(--tarjeta); border: 1px solid var(--borde); border-radius: 10px;
+  padding: 12px; margin: 0 0 16px; scroll-margin-top: 8px;
+}
+.contenedor-tabla { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; min-width: 560px; text-align: center; }
+th, td { border: 1px solid var(--borde); padding: 3px 2px; }
+thead th { font-weight: normal; color: var(--suave); font-size: 0.85rem; }
+th.fecha span { display: block; }
+.inicial { font-weight: bold; }
+.dia { color: var(--suave); font-size: 0.85rem; }
+th.fecha, thead th:first-child {
+  position: sticky; left: 0; background: var(--tarjeta); font-weight: normal; width: 2.4rem;
+}
+td { min-width: 2.4rem; white-space: nowrap; font-size: 1.05rem; padding: 2px 0 0; color: #111; }
+td small { display: block; font-size: 0.75rem; margin-top: 2px; padding: 1px 0; }
+td i { display: inline-block; font-style: normal; font-size: 0.9rem; line-height: 1; margin-left: 2px; }
+.umbral { font-weight: bold; }
+.vacia { color: var(--suave); padding: 3px 2px; }
+.v0 { background: #ffffff; }
+.v1 { background: #d9fbff; }
+.v2 { background: #9ff0f0; }
+.v3 { background: #9ef59a; }
+.v4 { background: #5fe85a; }
+.v5 { background: #35d43a; }
+.v6 { background: #c4f03a; }
+.v7 { background: #fff23a; }
+.v8 { background: #ffcc33; }
+.v9 { background: #ff9a33; }
+.v10 { background: #ff5a3c; }
+.v11 { background: #ff3f7f; }
+.v12 { background: #ff3fd2; }
+.v13 { background: #c13dff; }
+.sin-datos, .no-disponible { color: var(--suave); }
+footer { color: var(--suave); font-size: 0.85rem; margin-top: 8px; }
+</style>
+<style>
+.volver { color: var(--enlace); text-decoration: none; }
+form { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: flex-end; margin: 0 0 16px; }
+form label { display: flex; flex-direction: column; flex: 1 1 140px; color: var(--suave); font-size: 0.9rem; }
+form input {
+  font: inherit; padding: 8px; border: 1px solid var(--borde); border-radius: 8px;
+  background: var(--tarjeta); color: var(--texto);
+}
+form button {
+  font: inherit; font-weight: bold; padding: 9px 20px; border: 0; border-radius: 8px; cursor: pointer;
+  background: var(--boton); color: var(--boton-texto);
+}
+.modelo { flex: 1 1 100%; display: flex; flex-wrap: wrap; gap: 4px 16px; margin: 0; padding: 0; border: 0; }
+.modelo legend { padding: 0; margin-bottom: 4px; color: var(--suave); font-size: 0.9rem; }
+.modelo label { flex-direction: row; align-items: center; gap: 6px; flex: 0 0 auto; color: var(--texto); font-size: 1rem; }
+.buscando, .nota { color: var(--suave); }
+.nota { margin: 0 0 8px; }
+</style>
+<script type="module" src="js/buscador.js"></script>
+</head>
+<body>
+<main>
+<h1>GoodWind — previsión de viento</h1>
+<p><a class="volver" href="index.html">← Pantanos</a></p>
+<form id="buscador" novalidate>
+<label for="latitud">Latitud <input id="latitud" name="latitud" placeholder="40.757" autocomplete="off"></label>
+<label for="longitud">Longitud <input id="longitud" name="longitud" placeholder="-3.583" autocomplete="off"></label>
+<fieldset class="modelo"><legend>Modelo</legend>
+<label><input type="radio" name="modelo" value="estandar" checked> Sin AROME</label>
+<label><input type="radio" name="modelo" value="arome"> Con AROME HD</label>
+</fieldset>
+<button type="submit">Buscar</button>
+</form>
+<div id="resultado" aria-live="polite"></div>
+<footer>Viento y rachas en nudos. La flecha indica hacia dónde sopla el viento. Datos: Open-Meteo.com</footer>
+</main>
+</body>
+</html>
