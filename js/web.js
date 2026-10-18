@@ -209,8 +209,15 @@ const CSS_BUSCADOR = `
 .volver { color: var(--enlace); text-decoration: none; }
 form { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: flex-end; margin: 0 0 16px; }
 form label { display: flex; flex-direction: column; flex: 1 1 140px; color: var(--suave); font-size: 0.9rem; }
-form label.pantano { flex-basis: 100%; }
-form input, form select {
+.pantanos { flex: 1 1 100%; margin: 0; padding: 0; border: 0; }
+.pantanos legend { padding: 0; margin-bottom: 6px; color: var(--suave); font-size: 0.9rem; }
+.pantanos ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+form .pantanos button {
+  font-weight: normal; padding: 6px 10px; border: 1px solid var(--borde); border-radius: 999px;
+  color: var(--enlace); background: var(--tarjeta);
+}
+form .pantanos button[aria-pressed="true"] { background: var(--enlace); border-color: var(--enlace); color: var(--tarjeta); }
+form input {
   font: inherit; padding: 8px; border: 1px solid var(--borde); border-radius: 8px;
   background: var(--tarjeta); color: var(--texto);
 }
@@ -227,16 +234,19 @@ form button {
 .mapa iframe { display: block; width: 100%; height: 400px; border: 0; border-radius: 8px; }
 `;
 
-// Desplegable con los pantanos de config/goodwind.json: al elegir uno, buscador.js rellena sus coordenadas.
-// Cada opción lleva «latitud;longitud», que separarPareja ya sabe leer.
+// Botones con los pantanos de config/goodwind.json, con el aspecto del índice de la página principal:
+// al pulsar uno, buscador.js rellena sus coordenadas. Cada botón lleva «latitud;longitud», que separarPareja ya sabe leer.
 function selectorPantanos(pantanos) {
   if (pantanos.length === 0) return "";
-  const opciones = pantanos
-    .map((p) => `<option value="${p.latitud};${p.longitud}">${escapar(p.nombre)}</option>`)
-    .join("\n");
+  const botones = pantanos
+    .map(
+      (p) =>
+        `<li><button type="button" data-coordenadas="${p.latitud};${p.longitud}" aria-pressed="false">${escapar(p.nombre)}</button></li>`,
+    )
+    .join("");
   return (
-    `<label class="pantano" for="pantano">Pantano <select id="pantano">\n` +
-    `<option value="">Elegir un pantano…</option>\n${opciones}\n</select></label>\n`
+    `<fieldset class="pantanos"><legend>Elige un pantano o teclea las coordenadas de tu ubicación</legend>\n` +
+    `<ul>${botones}</ul>\n</fieldset>\n`
   );
 }
 

@@ -73,8 +73,15 @@ footer { color: var(--suave); font-size: 0.85rem; margin-top: 8px; }
 .volver { color: var(--enlace); text-decoration: none; }
 form { display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: flex-end; margin: 0 0 16px; }
 form label { display: flex; flex-direction: column; flex: 1 1 140px; color: var(--suave); font-size: 0.9rem; }
-form label.pantano { flex-basis: 100%; }
-form input, form select {
+.pantanos { flex: 1 1 100%; margin: 0; padding: 0; border: 0; }
+.pantanos legend { padding: 0; margin-bottom: 6px; color: var(--suave); font-size: 0.9rem; }
+.pantanos ul { list-style: none; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+form .pantanos button {
+  font-weight: normal; padding: 6px 10px; border: 1px solid var(--borde); border-radius: 999px;
+  color: var(--enlace); background: var(--tarjeta);
+}
+form .pantanos button[aria-pressed="true"] { background: var(--enlace); border-color: var(--enlace); color: var(--tarjeta); }
+form input {
   font: inherit; padding: 8px; border: 1px solid var(--borde); border-radius: 8px;
   background: var(--tarjeta); color: var(--texto);
 }
@@ -97,13 +104,9 @@ form button {
 <h1>GoodWind — previsión de viento</h1>
 <p><a class="volver" href="index.html">← Pantanos</a></p>
 <form id="buscador" novalidate>
-<label class="pantano" for="pantano">Pantano <select id="pantano">
-<option value="">Elegir un pantano…</option>
-<option value="40.7792;-3.647">Pantano del Vellón</option>
-<option value="40.9199;-3.5348">Pantano del Atazar</option>
-<option value="40.015;-4.6946">Embalse de Cazalegas</option>
-<option value="39.7026;-2.2533">Embalse de Alarcón</option>
-</select></label>
+<fieldset class="pantanos"><legend>Elige un pantano o teclea las coordenadas de tu ubicación</legend>
+<ul><li><button type="button" data-coordenadas="40.7792;-3.647" aria-pressed="false">Pantano del Vellón</button></li><li><button type="button" data-coordenadas="40.9199;-3.5348" aria-pressed="false">Pantano del Atazar</button></li><li><button type="button" data-coordenadas="40.015;-4.6946" aria-pressed="false">Embalse de Cazalegas</button></li><li><button type="button" data-coordenadas="39.7026;-2.2533" aria-pressed="false">Embalse de Alarcón</button></li></ul>
+</fieldset>
 <label for="latitud">Latitud <input id="latitud" name="latitud" placeholder="40.757" autocomplete="off"></label>
 <label for="longitud">Longitud <input id="longitud" name="longitud" placeholder="-3.583" autocomplete="off"></label>
 <fieldset class="modelo"><legend>Modelo</legend>
