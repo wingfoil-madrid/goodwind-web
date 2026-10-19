@@ -67,6 +67,9 @@ td i { display: inline-block; font-style: normal; font-size: 0.9rem; line-height
 .v12 { background: #ff3fd2; }
 .v13 { background: #c13dff; }
 .sin-datos, .no-disponible { color: var(--suave); }
+.favorable { color: var(--suave); font-size: 0.9rem; margin: 8px 0 0; }
+.llegar { font-size: 0.9rem; margin: 6px 0 0; }
+.llegar a { color: var(--enlace); text-decoration: none; }
 footer { color: var(--suave); font-size: 0.85rem; margin-top: 8px; }
 </style>
 <style>
@@ -102,10 +105,10 @@ form button {
 <body>
 <main>
 <h1>GoodWind — previsión de viento</h1>
-<p><a class="volver" href="index.html">← Pantanos</a></p>
+<p><a class="volver" href="index.html">← Embalses</a></p>
 <form id="buscador" novalidate>
-<fieldset class="pantanos"><legend>Elige un pantano o teclea las coordenadas de tu ubicación</legend>
-<ul><li><button type="button" data-coordenadas="40.7792;-3.647" aria-pressed="false">Pantano del Vellón</button></li><li><button type="button" data-coordenadas="40.9199;-3.5348" aria-pressed="false">Pantano del Atazar</button></li><li><button type="button" data-coordenadas="40.015;-4.6946" aria-pressed="false">Embalse de Cazalegas</button></li><li><button type="button" data-coordenadas="39.7026;-2.2533" aria-pressed="false">Embalse de Alarcón</button></li></ul>
+<fieldset class="pantanos"><legend>Elige un embalse o teclea las coordenadas de tu ubicación</legend>
+<ul><li><button type="button" data-coordenadas="40.7792;-3.647" aria-pressed="false">Embalse del Vellón</button></li><li><button type="button" data-coordenadas="40.9199;-3.5348" aria-pressed="false">Embalse de El Atazar</button></li><li><button type="button" data-coordenadas="40.015;-4.6946" aria-pressed="false">Embalse de Cazalegas</button></li><li><button type="button" data-coordenadas="39.7026;-2.2533" aria-pressed="false">Embalse de Alarcón</button></li></ul>
 </fieldset>
 <label for="latitud">Latitud <input id="latitud" name="latitud" placeholder="40.757" autocomplete="off"></label>
 <label for="longitud">Longitud <input id="longitud" name="longitud" placeholder="-3.583" autocomplete="off"></label>

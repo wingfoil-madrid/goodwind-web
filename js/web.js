@@ -83,6 +83,9 @@ td i { display: inline-block; font-style: normal; font-size: 0.9rem; line-height
 .vacia { color: var(--suave); padding: 3px 2px; }
 ${ESCALA.map(([desde, color], i) => `.v${i} { background: ${color}; }`).join("\n")}
 .sin-datos, .no-disponible { color: var(--suave); }
+.favorable { color: var(--suave); font-size: 0.9rem; margin: 8px 0 0; }
+.llegar { font-size: 0.9rem; margin: 6px 0 0; }
+.llegar a { color: var(--enlace); text-decoration: none; }
 footer { color: var(--suave); font-size: 0.85rem; margin-top: 8px; }
 `;
 
@@ -103,7 +106,7 @@ function crearIds(previsiones) {
         .replace(/[̀-ͯ]/g, "")
         .toLowerCase()
         .replace(/[^a-z0-9]+/g, "-")
-        .replace(/^-|-$/g, "") || "pantano";
+        .replace(/^-|-$/g, "") || "embalse";
     const n = (usados.get(base) ?? 0) + 1;
     usados.set(base, n);
     return n === 1 ? base : `${base}-${n}`;
@@ -142,13 +145,41 @@ export function tabla(dias) {
   );
 }
 
+// Direcciones de viento buenas para navegar en ese embalse («favorable» y «aceptable» de la configuración), si las hay.
+function notaFavorable({ favorable, aceptable }) {
+  let texto;
+  if (favorable) {
+    texto = `Viento favorable: ${favorable === "todas" ? "todas las direcciones" : favorable.join(", ")}`;
+    if (aceptable) texto += `, (${aceptable.join(", ")} - algo peores)`;
+  } else if (aceptable) {
+    texto = `Viento aceptable: ${aceptable.join(", ")}`;
+  } else {
+    return "";
+  }
+  return `<p class="favorable">🧭 ${escapar(texto)}</p>\n`;
+}
+
+// Ruta de Google Maps hasta el punto de llegada, desde donde esté quien lo abre (en el móvil, en la app).
+export function urlComoLlegar({ latitud, longitud }) {
+  return `https://www.google.com/maps/dir/?api=1&destination=${latitud},${longitud}`;
+}
+
+function enlaceComoLlegar(llegada) {
+  if (!llegada) return "";
+  return `<p class="llegar"><a href="${escapar(urlComoLlegar(llegada))}" target="_blank" rel="noopener">📍 Cómo llegar</a></p>\n`;
+}
+
 function seccion(prevision, id) {
-  const nombre = escapar(prevision.pantano.nombre);
+  const { pantano } = prevision;
+  const nombre = escapar(pantano.nombre);
   const contenido =
     prevision.estado === "ok"
       ? tabla(prevision.dias)
       : `<p class="sin-datos">Sin datos de previsión (intento: ${horaMinutos(prevision.obtenidaEn)})</p>`;
-  return `<section id="${id}">\n<h2>${nombre}</h2>\n${contenido}\n</section>`;
+  return (
+    `<section id="${id}">\n<h2>${nombre}</h2>\n${contenido}\n` +
+    `${notaFavorable(pantano)}${enlaceComoLlegar(pantano.llegada)}</section>`
+  );
 }
 
 function botonCompartir(aviso) {
@@ -169,7 +200,7 @@ export function generarHtml(previsiones,{ actualizadoEn = new Date(), aviso = nu
     cuerpo =
       botonCompartir(aviso) +
       BOTON_BUSCAR +
-      `<nav aria-label="Pantanos"><ul>${indice}</ul></nav>\n` +
+      `<nav aria-label="Embalses"><ul>${indice}</ul></nav>\n` +
       previsiones.map((p, i) => seccion(p, ids[i])).join("\n");
   } else {
     cuerpo = BOTON_BUSCAR + `<p class="no-disponible">Previsión no disponible en este momento</p>`;
@@ -245,7 +276,7 @@ function selectorPantanos(pantanos) {
     )
     .join("");
   return (
-    `<fieldset class="pantanos"><legend>Elige un pantano o teclea las coordenadas de tu ubicación</legend>\n` +
+    `<fieldset class="pantanos"><legend>Elige un embalse o teclea las coordenadas de tu ubicación</legend>\n` +
     `<ul>${botones}</ul>\n</fieldset>\n`
   );
 }
@@ -255,7 +286,7 @@ export function generarHtmlBuscador({ pantanos = [] } = {}) {
     titulo: TITULO,
     cabeza: `<style>${CSS_BUSCADOR}</style>\n<script type="module" src="js/buscador.js"></script>\n`,
     cuerpo:
-      `<p><a class="volver" href="index.html">← Pantanos</a></p>\n` +
+      `<p><a class="volver" href="index.html">← Embalses</a></p>\n` +
       `<form id="buscador" novalidate>\n` +
       selectorPantanos(pantanos) +
       `<label for="latitud">Latitud <input id="latitud" name="latitud" placeholder="40.757" autocomplete="off"></label>\n` +
