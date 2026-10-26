@@ -213,6 +213,14 @@ export function generarHtml(previsiones,{ actualizadoEn = new Date(), aviso = nu
 }
 
 // Esqueleto común de las páginas: mismo CSS, título y pie.
+// Para instalar la web en el móvil con su icono (manifiesto e iconos de estaticos/, copiados a site/ al generar).
+export const CABEZA_APP =
+  `<link rel="manifest" href="manifest.webmanifest">\n` +
+  `<link rel="icon" type="image/png" href="icono-192.png">\n` +
+  `<link rel="apple-touch-icon" href="apple-touch-icon.png">\n` +
+  `<meta name="apple-mobile-web-app-title" content="GoodWind">\n` +
+  `<meta name="theme-color" content="#02b7c8">\n`;
+
 export function pagina({ titulo, cuerpo, cabeza = "" }) {
   return `<!doctype html>
 <html lang="es">
@@ -220,7 +228,7 @@ export function pagina({ titulo, cuerpo, cabeza = "" }) {
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>${titulo}</title>
-<style>${CSS}</style>
+${CABEZA_APP}<style>${CSS}</style>
 ${cabeza}</head>
 <body>
 <main>
